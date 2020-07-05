@@ -1,3 +1,3 @@
 @echo off
 echo Compiling...
-gcc -L lib -I include .\src\drawAlgos.c -o drawAlgos -lmingw32 -lSDL2main -lSDL2  -mwindows && powershell write-host -fore Green Compile sucess && .\drawAlgos.exe
+gcc -L lib -I include .\src\drawAlgos.c -o drawAlgos -lmingw32 -lSDL2main -lSDL2  && powershell write-host -fore Green Compile sucess && .\drawAlgos.exe

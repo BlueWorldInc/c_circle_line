@@ -1,6 +1,6 @@
 #include <drawAlgos.h>
 
-void DDA_LineAlgorithm(SDL_Renderer* renderer);
+void DDA_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
 
 int main(int argc, char *argv[])
 {
@@ -83,11 +83,26 @@ void drawMainWindow(SDL_Renderer* renderer) {
     SDL_RenderDrawLine(renderer, 0, BASELINE, SCREEN_WIDTH, BASELINE);
 
     // draw point
-    DDA_LineAlgorithm(renderer);
+    DDA_LineAlgorithm(renderer, 0, 0, SCREEN_WIDTH, BASELINE);
+    DDA_LineAlgorithm(renderer, 0, BASELINE, SCREEN_WIDTH, 0);
 
     SDL_RenderPresent(renderer);
 }
 
-void DDA_LineAlgorithm(SDL_Renderer* renderer) {
-    SDL_RenderDrawPoint(renderer, 50, 60);
+void DDA_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
+    int d0 = x1 - x0;
+    int d1 = y1 - y0;
+    int steps = abs(d0) > abs(d1) ? abs(d0) : abs(d1);
+
+    double xInc = d0 / (double) steps;
+    double yInc = d1 / (double) steps;
+
+    double x = (double) x0;
+    double y = (double) y0;
+
+    for (int i = 0; i <= steps; i++) {
+        SDL_RenderDrawPoint(renderer, (int) x, (int) y);
+        x += xInc;
+        y += yInc;
+    }
 }
