@@ -92,6 +92,40 @@ void drawMainWindow(SDL_Renderer* renderer) {
     // Bresenham_LineAlgorithm_less_naive(renderer, 0, 0, 3, 2);
     // Bresenham_LineAlgorithm(renderer, 0, 0, 3, 2);
 
+    // performance of the algos
+    clock_t start = clock(), diff;
+    for (int i = 0; i < 1000000; i++) {
+        // DDA_LineAlgorithm(renderer, 0, 0, 666, 555);
+    }
+    diff = clock() - start;
+    int msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
+    
+    start = clock();
+    for (int i = 0; i < 1000000; i++) {
+        // Bresenham_LineAlgorithm_naive(renderer, 0, 0, 666, 555);
+    }
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
+
+    start = clock();
+    for (int i = 0; i < 1000000; i++) {
+        // Bresenham_LineAlgorithm_less_naive(renderer, 0, 0, 666, 555);
+    }
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
+    start = clock();
+
+    for (int i = 0; i < 1000000; i++) {
+        Bresenham_LineAlgorithm(renderer, 0, 0, 666, 555);
+    }
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
+
+
     SDL_RenderPresent(renderer);
 }
 
@@ -107,7 +141,7 @@ void DDA_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
     double y = (double) y0;
 
     for (int i = 0; i <= steps; i++) {
-        SDL_RenderDrawPoint(renderer, (int) x, (int) y);
+        // SDL_RenderDrawPoint(renderer, (int) x, (int) y);
         x += xInc;
         y += yInc;
     }
@@ -150,16 +184,16 @@ void Bresenham_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int
     // assume that y1 > y0
     // the added value is for rounding up instead of rounding down.
     int slope = 2 * (y1 - y0);
-    int slope_error = - slope;
+    int slope_error = slope - 2 * (x1 - x0);
     // printf("slope: %d\n", slope);
     // printf("slope_error: %d\n", slope_error);
     int x = x0;
     int y = y0;
-    for (int i = x0; i <= x1; i++) {
+    for (x = x0; x <= x1; x++) {
         // printf("------\n");
         // printf("x: %d\n", x);
         // printf("y: %d\n", y);
-        x++;
+        // x++;
         slope_error += slope;
         if (slope_error > 0) {
             y++;
