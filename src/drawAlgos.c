@@ -1,6 +1,9 @@
 #include <drawAlgos.h>
 
 void DDA_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
+void Bresenham_LineAlgorithm_naive(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
+void Bresenham_LineAlgorithm_less_naive(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
+void Bresenham_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
 
 int main(int argc, char *argv[])
 {
@@ -56,6 +59,7 @@ int main(int argc, char *argv[])
             drawMainWindow(renderer);
 
             SDL_Delay(10);
+            run = SDL_FALSE;
             switch (event.type) {
                 case SDL_KEYDOWN:
                     run = SDL_FALSE;
@@ -83,8 +87,10 @@ void drawMainWindow(SDL_Renderer* renderer) {
     SDL_RenderDrawLine(renderer, 0, BASELINE, SCREEN_WIDTH, BASELINE);
 
     // draw point
-    DDA_LineAlgorithm(renderer, 0, 0, SCREEN_WIDTH, BASELINE);
-    DDA_LineAlgorithm(renderer, 0, BASELINE, SCREEN_WIDTH, 0);
+    // DDA_LineAlgorithm(renderer, 500, 100, 600, 150);
+    // Bresenham_LineAlgorithm_naive(renderer, 0, 0, 3, 2);
+    // Bresenham_LineAlgorithm_less_naive(renderer, 0, 0, 3, 2);
+    // Bresenham_LineAlgorithm(renderer, 0, 0, 3, 2);
 
     SDL_RenderPresent(renderer);
 }
@@ -104,5 +110,60 @@ void DDA_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
         SDL_RenderDrawPoint(renderer, (int) x, (int) y);
         x += xInc;
         y += yInc;
+    }
+}
+
+void Bresenham_LineAlgorithm_naive(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
+    // assume that x1 > x0
+    // assume that y1 > y0
+    double slope = (y1 - y0) / (double) (x1 - x0);
+    // printf("slope: %lf\n", slope);
+    int x = x0;
+    double y = y0;
+    for (int i = x0; i <= x1; i++) {
+        x++;
+        y += slope;
+    }
+}
+
+void Bresenham_LineAlgorithm_less_naive(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
+    // assume that x1 > x0
+    // assume that y1 > y0
+    // the added value is for rounding up instead of rounding down.
+    double slope = (y1 - y0) / (double) (x1 - x0) + 0.0000000000000001;
+    double slope_error = 0;
+    // printf("slope: %.17g\n", slope);
+    int x = x0;
+    int y = y0;
+    for (int i = x0; i <= x1; i++) {
+        x++;
+        slope_error += slope;
+        if (slope_error >= 1) {
+            y++;
+            slope_error--;
+        }
+    }
+}
+
+void Bresenham_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
+    // assume that x1 > x0
+    // assume that y1 > y0
+    // the added value is for rounding up instead of rounding down.
+    int slope = 2 * (y1 - y0);
+    int slope_error = - slope;
+    // printf("slope: %d\n", slope);
+    // printf("slope_error: %d\n", slope_error);
+    int x = x0;
+    int y = y0;
+    for (int i = x0; i <= x1; i++) {
+        // printf("------\n");
+        // printf("x: %d\n", x);
+        // printf("y: %d\n", y);
+        x++;
+        slope_error += slope;
+        if (slope_error > 0) {
+            y++;
+            slope_error -= 2 * (x1 - x0);
+        }
     }
 }
