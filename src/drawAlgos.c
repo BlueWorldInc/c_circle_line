@@ -4,6 +4,8 @@ void DDA_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
 void Bresenham_LineAlgorithm_naive(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
 void Bresenham_LineAlgorithm_less_naive(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
 void Bresenham_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
+void bresenham(SDL_Renderer* renderer, int x1, int y1, int x2, int y2);
+void performanceTest(SDL_Renderer* renderer);
 
 int main(int argc, char *argv[])
 {
@@ -92,38 +94,7 @@ void drawMainWindow(SDL_Renderer* renderer) {
     // Bresenham_LineAlgorithm_less_naive(renderer, 0, 0, 3, 2);
     // Bresenham_LineAlgorithm(renderer, 0, 0, 3, 2);
 
-    // performance of the algos
-    clock_t start = clock(), diff;
-    for (int i = 0; i < 1000000; i++) {
-        // DDA_LineAlgorithm(renderer, 0, 0, 666, 555);
-    }
-    diff = clock() - start;
-    int msec = diff * 1000 / CLOCKS_PER_SEC;
-    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
-    
-    start = clock();
-    for (int i = 0; i < 1000000; i++) {
-        // Bresenham_LineAlgorithm_naive(renderer, 0, 0, 666, 555);
-    }
-    diff = clock() - start;
-    msec = diff * 1000 / CLOCKS_PER_SEC;
-    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
-
-    start = clock();
-    for (int i = 0; i < 1000000; i++) {
-        // Bresenham_LineAlgorithm_less_naive(renderer, 0, 0, 666, 555);
-    }
-    diff = clock() - start;
-    msec = diff * 1000 / CLOCKS_PER_SEC;
-    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
-    start = clock();
-
-    for (int i = 0; i < 1000000; i++) {
-        Bresenham_LineAlgorithm(renderer, 0, 0, 666, 555);
-    }
-    diff = clock() - start;
-    msec = diff * 1000 / CLOCKS_PER_SEC;
-    printf("Time taken %d.%d seconds\n", msec/1000, msec%1000);
+    performanceTest(renderer);
 
 
     SDL_RenderPresent(renderer);
@@ -200,4 +171,78 @@ void Bresenham_LineAlgorithm(SDL_Renderer* renderer, int x0, int y0, int x1, int
             slope_error -= 2 * (x1 - x0);
         }
     }
+}
+
+// Original algo, copied from https://www.geeksforgeeks.org/bresenhams-line-generation-algorithm/
+void bresenham(SDL_Renderer* renderer, int x1, int y1, int x2, int y2) { 
+   int m_new = 2 * (y2 - y1); 
+   int slope_error_new = m_new - (x2 - x1); 
+   for (int x = x1, y = y1; x <= x2; x++) 
+   { 
+      // Add slope to increment angle formed 
+      slope_error_new += m_new; 
+  
+      // Slope error reached limit, time to 
+      // increment y and update slope error. 
+      if (slope_error_new >= 0) 
+      { 
+         y++; 
+         slope_error_new  -= 2 * (x2 - x1); 
+      } 
+   } 
+}
+
+void performanceTest(SDL_Renderer* renderer) {
+    
+    int x0 = 0;
+    int y0 = 0;
+    int x1 = 555;
+    int y1 = 444;
+    int steps = 10000;
+
+    // DDA_LineAlgorithm
+        clock_t start = clock(), diff;
+        for (int i = 0; i < steps; i++) {
+            DDA_LineAlgorithm(renderer, x0, y0, x1, y1);
+        }
+        diff = clock() - start;
+        int msec = diff * 1000 / CLOCKS_PER_SEC;
+        printf("DDA_LineAlgorithm:                      Time taken %d.%d seconds\n", msec/1000, msec%1000);
+    
+    // Bresenham_LineAlgorithm_naive
+        start = clock();
+        for (int i = 0; i < steps; i++) {
+            Bresenham_LineAlgorithm_naive(renderer, x0, y0, x1, y1);
+        }
+        diff = clock() - start;
+        msec = diff * 1000 / CLOCKS_PER_SEC;
+        printf("Bresenham_LineAlgorithm_naive:          Time taken %d.%d seconds\n", msec/1000, msec%1000);
+
+    // Bresenham_LineAlgorithm_less_naive
+    start = clock();
+    for (int i = 0; i < steps; i++) {
+        Bresenham_LineAlgorithm_less_naive(renderer, x0, y0, x1, y1);
+    }
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("resenham_LineAlgorithm_less_naive:      Time taken %d.%d seconds\n", msec/1000, msec%1000);
+
+    // Bresenham_LineAlgorithm
+    start = clock();
+    for (int i = 0; i < steps; i++) {
+        Bresenham_LineAlgorithm(renderer, x0, y0, x1, y1);
+    }
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("Bresenham_LineAlgorithm:                Time taken %d.%d seconds\n", msec/1000, msec%1000);
+
+    // Bresenham
+    start = clock();
+    for (int i = 0; i < steps; i++) {
+        bresenham(renderer, x0, y0, x1, y1);
+    }
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("Bresenham:                              Time taken %d.%d seconds\n", msec/1000, msec%1000);
+
 }
